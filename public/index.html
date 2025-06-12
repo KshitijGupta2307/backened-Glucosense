@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sensor Data Table</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; font-family: Arial; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+    th { background-color: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h2>📊 Sensor Data (Last 5 Minutes)</h2>
+  <table id="sensorTable">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>TGS2602</th><th>H</th><th>MQ138</th><th>MQ2</th><th>T</th>
+        <th>TGS2600</th><th>TGS2603</th><th>TGS2610</th>
+        <th>TGS2620</th><th>TGS2611</th><th>TGS822</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    fetch('/sensor-data')
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.querySelector('#sensorTable tbody');
+        data.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${new Date(row.time).toLocaleString()}</td>
+            <td>${row.TGS2602 ?? ''}</td><td>${row.H ?? ''}</td><td>${row.MQ138 ?? ''}</td>
+            <td>${row.MQ2 ?? ''}</td><td>${row.T ?? ''}</td><td>${row.TGS2600 ?? ''}</td>
+            <td>${row.TGS2603 ?? ''}</td><td>${row.TGS2610 ?? ''}</td><td>${row.TGS2620 ?? ''}</td>
+            <td>${row.TGS2611 ?? ''}</td><td>${row.TGS822 ?? ''}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        document.body.innerHTML += `<p style="color:red;">Error loading data: ${err.message}</p>`;
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
