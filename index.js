@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const os = require('os');
 const { InfluxDB } = require('@influxdata/influxdb-client');
 
 const app = express();
@@ -10,18 +9,21 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.static('public'));
 
+// InfluxDB Setup
 const influxDB = new InfluxDB({
   url: process.env.INFLUX_URL,
   token: process.env.INFLUX_TOKEN,
 });
 const queryApi = influxDB.getQueryApi(process.env.INFLUX_ORG);
 
+// Sensor fields
 const SENSOR_FIELDS = [
   "TGS2602", "H", "MQ138", "MQ2", "T",
   "TGS2600", "TGS2603", "TGS2610",
   "TGS2620", "TGS2611", "TGS822"
 ];
 
+// API Route
 app.get('/sensor-data', async (req, res) => {
   console.log("📡 Hit /sensor-data");
 
@@ -55,18 +57,7 @@ app.get('/sensor-data', async (req, res) => {
   }
 });
 
-function getLocalIP() {
-  const interfaces = os.networkInterfaces();
-  for (const iface of Object.values(interfaces)) {
-    for (const config of iface) {
-      if (config.family === 'IPv4' && !config.internal) {
-        return config.address;
-      }
-    }
-  }
-  return 'localhost';
-}
-
-app.listen(port, '0.0.0.0', () => {
-  console.log(`🚀 Server running at http://${getLocalIP()}:${port}`);
+// Start server (Render exposes public IP automatically)
+app.listen(port, () => {
+  console.log(`🚀 Server running on port ${port}`);
 });
